@@ -1,16 +1,41 @@
-# React + Vite
+# Hiring Intelligence
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A recruitment-agency screening tool. The agency ingests candidate resumes in bulk
+on behalf of client companies; the system parses each resume, runs an ATS
+completeness check, scores every candidate against every open job, and hands each
+client a ranked shortlist.
 
-Currently, two official plugins are available:
+There is no candidate-facing side and no chatbot. Two roles: **agency admin** and
+**client-company recruiter**.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Run it
 
-## React Compiler
+```bash
+npm install
+npm run dev        # http://localhost:5173
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Demo accounts (password `password123` for both):
 
-## Expanding the Oxlint configuration
+| Role | Email |
+|------|-------|
+| Agency admin | `ishwari@hiringintelligence.io` |
+| Client recruiter (Northwind Logistics) | `rajesh.iyer@northwind.example` |
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+## How the data works
+
+There is no server yet. A browser-local database (`src/db/`, stored in
+`localStorage`) is seeded on first load with 3 client companies, 8 jobs and 52
+synthetic candidates. As admin, use **Resume Ingestion** to drop more resumes
+(`.txt`/`.csv`/`.json` are parsed for real; `.pdf`/`.docx` are stored and
+ATS-flagged) or load the bundled sample batch. **Reset local database** on that
+screen restores the seed.
+
+## Docs
+
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — roles, data model, screening pipeline, frontend layout
+- [`docs/BACKEND_SPEC.md`](docs/BACKEND_SPEC.md) — Spring Boot + PostgreSQL implementation brief (schema, endpoints, auth, scoring)
+
+## Stack
+
+React 19, Vite, Tailwind v4, React Router, Recharts. `npm run build`, `npm run lint`.

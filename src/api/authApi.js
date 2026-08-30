@@ -1,45 +1,22 @@
-import axiosClient from './axiosClient';
-import { mockDelay, mockError, USE_MOCK_API } from './mockHelpers';
-import { mockUsers } from './mockData/users';
+import { mockDelay, mockError } from './mockHelpers';
+import { getAll } from '../db/store';
 
-function makeToken(user) {
-  return `mock-jwt.${user.role}.${user.id}`;
+function publicUser(user) {
+  return {
+    token: `local.${user.role}.${user.id}`,
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    companyId: user.companyId ?? null,
+    title: user.title ?? '',
+  };
 }
 
 export async function login({ email, password }) {
-  if (USE_MOCK_API) {
-    const user = mockUsers.find((u) => u.email === email && u.password === password);
-    if (!user) {
-      return mockError('Invalid email or password');
-    }
-    return mockDelay({
-      token: makeToken(user),
-      role: user.role,
-      name: user.name,
-      email: user.email,
-    });
-  }
-
-  const { data } = await axiosClient.post('/auth/login', { email, password });
-  return data;
-}
-
-export async function register({ name, email, password, role }) {
-  if (USE_MOCK_API) {
-    const exists = mockUsers.some((u) => u.email === email);
-    if (exists) {
-      return mockError('An account with this email already exists');
-    }
-    const newUser = { id: `u${mockUsers.length + 1}`, name, email, password, role };
-    mockUsers.push(newUser);
-    return mockDelay({
-      token: makeToken(newUser),
-      role: newUser.role,
-      name: newUser.name,
-      email: newUser.email,
-    });
-  }
-
-  const { data } = await axiosClient.post('/auth/register', { name, email, password, role });
-  return data;
+  const user = getAll('users').find(
+    (u) => u.email.toLowerCase() === String(email).toLowerCase() && u.password === password
+  );
+  if (!user) return mockError('Invalid email or password');
+  return mockDelay(publicUser(user));
 }

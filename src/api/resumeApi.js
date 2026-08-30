@@ -1,72 +1,50 @@
-import axiosClient from './axiosClient';
-import { USE_MOCK_API } from './mockHelpers';
+import { mockDelay } from './mockHelpers';
+import { ingestResumes } from '../db/queries';
+import { SAMPLE_RESUME_BATCH } from '../db/sampleBatch';
 
-const SAMPLE_NAMES = [
-  'Ishaan Kapoor', 'Meera Pillai', 'Aditya Singh', 'Tanvi Deshmukh', 'Rohan Chatterjee',
-  'Kavya Reddy', 'Yash Agarwal', 'Simran Kaur', 'Nikhil Bhat', 'Pooja Menon',
-];
-const SAMPLE_SKILLS = [
-  'Java', 'Spring Boot', 'React', 'AWS', 'Docker', 'Kubernetes', 'Python', 'SQL',
-  'PostgreSQL', 'JavaScript', 'TypeScript', 'Terraform', 'Kafka', 'Node.js',
-];
-const SAMPLE_EDUCATION = [
-  'B.Tech Computer Science, IIT Bombay',
-  'B.E. Information Technology, VJTI Mumbai',
-  'M.Tech Software Engineering, BITS Pilani',
-  'B.Sc Computer Science, Delhi University',
-  'B.Tech Electronics & Communication, NIT Trichy',
-];
-
-function pickRandom(arr, count) {
-  const shuffled = [...arr].sort(() => 0.5 - Math.random());
-  return shuffled.slice(0, count);
+function readFileText(file) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ''));
+    reader.onerror = () => resolve('');
+    reader.readAsText(file);
+  });
 }
 
-function fakeParsedResult(fileName) {
-  return {
-    fileName,
-    name: SAMPLE_NAMES[Math.floor(Math.random() * SAMPLE_NAMES.length)],
-    skills: pickRandom(SAMPLE_SKILLS, 3 + Math.floor(Math.random() * 4)),
-    experienceYears: 1 + Math.floor(Math.random() * 9),
-    education: SAMPLE_EDUCATION[Math.floor(Math.random() * SAMPLE_EDUCATION.length)],
-  };
-}
+// Ingests dropped files. Text/CSV/JSON resumes are parsed for real; binary PDFs
+// can't be read in-browser for the demo, so a placeholder record is created and
+// flagged by the ATS check for manual review.
+export async function uploadResumes(files, { onFileStatusChange } = {}) {
+  const entries = [];
+  for (const file of files) {
+    onFileStatusChange?.(file.name, 'uploading');
+    const isText = /\.(txt|csv|json|md)$/i.test(file.name) || file.type.startsWith('text/');
+    let raw = '';
+    if (isText) raw = await readFileText(file);
+    onFileStatusChange?.(file.name, 'parsing');
+    await mockDelay(null, 300 + Math.random() * 400);
 
-// Uploads and "parses" resumes. onFileStatusChange(fileName, status, data?) is called
-// as each file progresses through 'uploading' -> 'parsing' -> 'done' | 'error'.
-export async function uploadResumes(files, { jobId, onFileStatusChange } = {}) {
-  if (USE_MOCK_API) {
-    const results = await Promise.all(
-      files.map(
-        (file) =>
-          new Promise((resolve) => {
-            onFileStatusChange?.(file.name, 'uploading');
-            setTimeout(() => {
-              onFileStatusChange?.(file.name, 'parsing');
-              setTimeout(() => {
-                const shouldFail = Math.random() < 0.08;
-                if (shouldFail) {
-                  onFileStatusChange?.(file.name, 'error');
-                  resolve({ fileName: file.name, error: 'Could not parse resume' });
-                  return;
-                }
-                const parsed = fakeParsedResult(file.name);
-                onFileStatusChange?.(file.name, 'done', parsed);
-                resolve(parsed);
-              }, 700 + Math.random() * 900);
-            }, 500 + Math.random() * 500);
-          })
-      )
-    );
-    return results;
+    if (file.name.toLowerCase().endsWith('.json') && raw.trim().startsWith('[')) {
+      try {
+        JSON.parse(raw).forEach((row) => entries.push({ ...row, sourceFile: file.name }));
+        onFileStatusChange?.(file.name, 'done');
+        continue;
+      } catch {
+        /* fall through to single-record handling */
+      }
+    }
+
+    entries.push({
+      rawText: raw || `${file.name.replace(/\.[a-z]+$/i, '').replace(/[_-]+/g, ' ')}\n(Resume text could not be extracted from this file.)`,
+      sourceFile: file.name,
+    });
+    onFileStatusChange?.(file.name, 'done');
   }
 
-  const formData = new FormData();
-  files.forEach((file) => formData.append('files', file));
-  if (jobId) formData.append('jobId', jobId);
+  return mockDelay(ingestResumes(entries), 400);
+}
 
-  const { data } = await axiosClient.post('/resumes/upload', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  });
-  return data;
+// One-click loader for the bundled Kaggle-style dataset.
+export async function loadSampleDataset() {
+  return mockDelay(ingestResumes(SAMPLE_RESUME_BATCH), 900);
 }

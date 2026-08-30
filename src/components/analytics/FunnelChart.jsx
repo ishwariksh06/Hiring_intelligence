@@ -20,7 +20,7 @@ export default function FunnelChart({ data }) {
             tickLine={false}
           />
           <Tooltip {...TOOLTIP_STYLE} formatter={(value) => [value, 'Candidates']} />
-          <Bar dataKey="count" name="Candidates" radius={[0, 4, 4, 0]} maxBarSize={32}>
+          <Bar dataKey="count" name="Candidates" radius={[0, 4, 4, 0]} maxBarSize={32} isAnimationActive={false}>
             {data.map((entry, index) => (
               <Cell key={entry.stage} fill={SEQUENTIAL_ORDINAL[index % SEQUENTIAL_ORDINAL.length]} />
             ))}

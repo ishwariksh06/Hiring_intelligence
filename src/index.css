@@ -1,5 +1,21 @@
 @import "tailwindcss";
 
+/* Brand accent. The UI was built with Tailwind's `indigo-*` utility names; we
+   remap that ramp to a restrained slate-blue so the whole app reads as a plain
+   internal tool rather than a bright template. No gradients anywhere. */
+@theme {
+  --color-indigo-50: #eef1f5;
+  --color-indigo-100: #dde3ec;
+  --color-indigo-200: #c2ccdb;
+  --color-indigo-300: #9aa9bf;
+  --color-indigo-400: #6b7c93;
+  --color-indigo-500: #4a5b73;
+  --color-indigo-600: #33445c;
+  --color-indigo-700: #26364a;
+  --color-indigo-800: #1d2a3a;
+  --color-indigo-900: #151f2b;
+}
+
 html,
 body,
 #root {
@@ -8,7 +24,13 @@ body,
 
 body {
   margin: 0;
-  background-color: #f8fafc;
-  color: #0f172a;
-  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+  background-color: #f4f5f7;
+  color: #1d2530;
+  font-family: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Slightly tighter, less "template" headings. */
+h1, h2, h3 {
+  letter-spacing: -0.01em;
 }

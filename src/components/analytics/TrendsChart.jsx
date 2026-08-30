@@ -14,8 +14,8 @@ export default function TrendsChart({ data }) {
           <YAxis tick={{ fontSize: 11, fill: CHART_CHROME.tick }} axisLine={false} tickLine={false} allowDecimals={false} />
           <Tooltip {...TOOLTIP_STYLE} />
           <Legend wrapperStyle={{ fontSize: 12 }} iconType="circle" />
-          <Line type="monotone" dataKey="applications" name="Applications" stroke={CATEGORICAL.blue} strokeWidth={2} dot={{ r: 4 }} activeDot={{ r: 5 }} />
-          <Line type="monotone" dataKey="hires" name="Hires" stroke={CATEGORICAL.orange} strokeWidth={2} dot={{ r: 4 }} activeDot={{ r: 5 }} />
+          <Line type="monotone" dataKey="ingested" name="Ingested" stroke={CATEGORICAL.blue} strokeWidth={2} dot={{ r: 4 }} activeDot={{ r: 5 }} isAnimationActive={false} />
+          <Line type="monotone" dataKey="shortlisted" name="Shortlisted" stroke={CATEGORICAL.orange} strokeWidth={2} dot={{ r: 4 }} activeDot={{ r: 5 }} isAnimationActive={false} />
         </LineChart>
       </ResponsiveContainer>
     </div>

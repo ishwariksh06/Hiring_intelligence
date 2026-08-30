@@ -15,7 +15,7 @@ export default function SkillAnalyticsChart({ data }) {
           <XAxis dataKey="skill" tick={{ fontSize: 11, fill: CHART_CHROME.tick }} axisLine={{ stroke: CHART_CHROME.axis }} tickLine={false} />
           <YAxis tick={{ fontSize: 11, fill: CHART_CHROME.tick }} axisLine={false} tickLine={false} allowDecimals={false} />
           <Tooltip {...TOOLTIP_STYLE} formatter={(value) => [value, 'Candidates']} />
-          <Bar dataKey="count" name="Candidates" fill={CATEGORICAL.blue} radius={[4, 4, 0, 0]} maxBarSize={48} />
+          <Bar dataKey="count" name="Candidates" fill={CATEGORICAL.blue} radius={[4, 4, 0, 0]} maxBarSize={48} isAnimationActive={false} />
         </BarChart>
       </ResponsiveContainer>
     </div>

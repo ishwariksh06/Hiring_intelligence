@@ -14,8 +14,8 @@ export default function SkillGapChart({ data }) {
           <YAxis tick={{ fontSize: 11, fill: CHART_CHROME.tick }} axisLine={false} tickLine={false} allowDecimals={false} />
           <Tooltip {...TOOLTIP_STYLE} />
           <Legend wrapperStyle={{ fontSize: 12 }} iconType="circle" />
-          <Bar dataKey="required" name="Required" fill={CATEGORICAL.blue} radius={[4, 4, 0, 0]} maxBarSize={28} />
-          <Bar dataKey="available" name="Available" fill={CATEGORICAL.orange} radius={[4, 4, 0, 0]} maxBarSize={28} />
+          <Bar dataKey="required" name="Required" fill={CATEGORICAL.blue} radius={[4, 4, 0, 0]} maxBarSize={28} isAnimationActive={false} />
+          <Bar dataKey="available" name="Available" fill={CATEGORICAL.orange} radius={[4, 4, 0, 0]} maxBarSize={28} isAnimationActive={false} />
         </BarChart>
       </ResponsiveContainer>
     </div>

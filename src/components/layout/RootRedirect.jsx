@@ -1,10 +1,9 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { landingPathForRole } from '../../utils/redirectByRole';
 
 export default function RootRedirect() {
   const { isAuthenticated, user } = useAuth();
-
   if (!isAuthenticated) return <Navigate to="/login" replace />;
-  if (user.role === 'CANDIDATE') return <Navigate to="/candidate/upload" replace />;
-  return <Navigate to="/dashboard" replace />;
+  return <Navigate to={landingPathForRole(user.role)} replace />;
 }

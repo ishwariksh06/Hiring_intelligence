@@ -25,32 +25,21 @@ export function AuthProvider({ children }) {
     setLoading(true);
     setError(null);
     try {
-      const { token, role, name, email } = await authApi.login(credentials);
-      const userData = { name, role, email };
-      localStorage.setItem(TOKEN_KEY, token);
+      const result = await authApi.login(credentials);
+      const userData = {
+        id: result.id,
+        name: result.name,
+        email: result.email,
+        role: result.role,
+        companyId: result.companyId,
+        title: result.title,
+      };
+      localStorage.setItem(TOKEN_KEY, result.token);
       localStorage.setItem(USER_KEY, JSON.stringify(userData));
       setUser(userData);
       return userData;
     } catch (err) {
       setError(err.message || 'Login failed');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const register = useCallback(async (payload) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const { token, role, name, email } = await authApi.register(payload);
-      const userData = { name, role, email };
-      localStorage.setItem(TOKEN_KEY, token);
-      localStorage.setItem(USER_KEY, JSON.stringify(userData));
-      setUser(userData);
-      return userData;
-    } catch (err) {
-      setError(err.message || 'Registration failed');
       throw err;
     } finally {
       setLoading(false);
@@ -64,8 +53,8 @@ export function AuthProvider({ children }) {
   }, []);
 
   const value = useMemo(
-    () => ({ user, isAuthenticated: !!user, loading, error, login, register, logout }),
-    [user, loading, error, login, register, logout]
+    () => ({ user, isAuthenticated: !!user, loading, error, login, logout }),
+    [user, loading, error, login, logout]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
@@ -75,4 +64,10 @@ export function useAuth() {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error('useAuth must be used within an AuthProvider');
   return ctx;
+}
+
+// Convenience: the scope object every data query expects.
+export function useScope() {
+  const { user } = useAuth();
+  return { role: user?.role, companyId: user?.companyId ?? null };
 }

@@ -5,55 +5,53 @@ import AppLayout from './components/layout/AppLayout';
 import RootRedirect from './components/layout/RootRedirect';
 
 import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
 import UnauthorizedPage from './pages/UnauthorizedPage';
 import DashboardPage from './pages/DashboardPage';
+import CompaniesPage from './pages/CompaniesPage';
+import CompanyDetailPage from './pages/CompanyDetailPage';
+import IngestPage from './pages/IngestPage';
+import CandidatePoolPage from './pages/CandidatePoolPage';
 import JobsListPage from './pages/JobsListPage';
 import JobFormPage from './pages/JobFormPage';
 import JobDetailPage from './pages/JobDetailPage';
-import ResumeUploadPage from './pages/ResumeUploadPage';
 import CandidateProfilePage from './pages/CandidateProfilePage';
-import AssistantPage from './pages/AssistantPage';
 import AnalyticsPage from './pages/AnalyticsPage';
 import ReportsPage from './pages/ReportsPage';
-import CandidateResumeUploadPage from './pages/CandidateResumeUploadPage';
-import ApplicationStatusPage from './pages/ApplicationStatusPage';
 
-const RECRUITER_ROLES = ['RECRUITER', 'ADMIN'];
+const BOTH = ['ADMIN', 'RECRUITER'];
 
 const router = createBrowserRouter([
   { path: '/', element: <RootRedirect /> },
   { path: '/login', element: <LoginPage /> },
-  { path: '/register', element: <RegisterPage /> },
   { path: '/unauthorized', element: <UnauthorizedPage /> },
   {
-    element: <ProtectedRoute allowedRoles={RECRUITER_ROLES} />,
+    element: <ProtectedRoute allowedRoles={BOTH} />,
     children: [
       {
         element: <AppLayout />,
         children: [
-          { path: '/dashboard', element: <DashboardPage />, handle: { title: 'Dashboard' } },
-          { path: '/jobs', element: <JobsListPage />, handle: { title: 'Job Management' } },
-          { path: '/jobs/new', element: <JobFormPage mode="create" />, handle: { title: 'Create Job' } },
+          { path: '/dashboard', element: <DashboardPage />, handle: { title: 'Overview' } },
+          { path: '/jobs', element: <JobsListPage />, handle: { title: 'Jobs' } },
+          { path: '/jobs/new', element: <JobFormPage mode="create" />, handle: { title: 'New Job' } },
           { path: '/jobs/:id/edit', element: <JobFormPage mode="edit" />, handle: { title: 'Edit Job' } },
-          { path: '/jobs/:id', element: <JobDetailPage />, handle: { title: 'Job Detail & Ranking' } },
-          { path: '/upload', element: <ResumeUploadPage />, handle: { title: 'Resume Upload' } },
-          { path: '/candidates/:id', element: <CandidateProfilePage />, handle: { title: 'Candidate Profile' } },
-          { path: '/assistant', element: <AssistantPage />, handle: { title: 'AI Chat Assistant' } },
-          { path: '/analytics', element: <AnalyticsPage />, handle: { title: 'Analytics Dashboard' } },
+          { path: '/jobs/:id', element: <JobDetailPage />, handle: { title: 'Job & Shortlist' } },
+          { path: '/candidates/:id', element: <CandidateProfilePage />, handle: { title: 'Candidate' } },
+          { path: '/analytics', element: <AnalyticsPage />, handle: { title: 'Analytics' } },
           { path: '/reports', element: <ReportsPage />, handle: { title: 'Reports' } },
         ],
       },
     ],
   },
   {
-    element: <ProtectedRoute allowedRoles={['CANDIDATE']} />,
+    element: <ProtectedRoute allowedRoles={['ADMIN']} />,
     children: [
       {
         element: <AppLayout />,
         children: [
-          { path: '/candidate/upload', element: <CandidateResumeUploadPage />, handle: { title: 'Upload Resume' } },
-          { path: '/candidate/status', element: <ApplicationStatusPage />, handle: { title: 'Application Status' } },
+          { path: '/companies', element: <CompaniesPage />, handle: { title: 'Client Companies' } },
+          { path: '/companies/:id', element: <CompanyDetailPage />, handle: { title: 'Client Company' } },
+          { path: '/ingest', element: <IngestPage />, handle: { title: 'Resume Ingestion' } },
+          { path: '/candidates', element: <CandidatePoolPage />, handle: { title: 'Candidate Pool' } },
         ],
       },
     ],
