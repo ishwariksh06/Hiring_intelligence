@@ -1,18 +1,21 @@
-import { mockDelay } from './mockHelpers';
-import * as q from '../db/queries';
+import axiosClient from './axiosClient';
 
-export async function getSkillAnalytics(ctx = {}) {
-  return mockDelay(q.skillDemand(ctx));
+export async function getSkillAnalytics() {
+  const { data } = await axiosClient.get('/analytics/skills');
+  return data;
 }
 
-export async function getScreeningFunnel(ctx = {}) {
-  return mockDelay(q.screeningFunnel(ctx));
+export async function getScreeningFunnel() {
+  const { data } = await axiosClient.get('/analytics/funnel');
+  return data;
 }
 
-export async function getSkillGap(ctx = {}) {
-  return mockDelay(q.skillGap(ctx));
+export async function getSkillGap() {
+  const { data } = await axiosClient.get('/analytics/skill-gap');
+  return data;
 }
 
-export async function getIngestTrend(ctx = {}) {
-  return mockDelay(q.ingestTrend(ctx));
+export async function getIngestTrend() {
+  const { data } = await axiosClient.get('/analytics/trend');
+  return data;
 }

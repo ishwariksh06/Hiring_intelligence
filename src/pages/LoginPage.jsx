@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Button from '../components/common/Button';
 import { redirectByRole } from '../utils/redirectByRole';
-import { AGENCY } from '../db/seed';
+import { AGENCY } from '../config/agency';
 
 const DEMO_ACCOUNTS = [
   { label: 'Administrator (agency)', email: 'ishwari@hiringintelligence.io' },

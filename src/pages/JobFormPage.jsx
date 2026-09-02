@@ -3,7 +3,6 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { createJob, getJobById, updateJob } from '../api/jobsApi';
 import { getCompanies } from '../api/companiesApi';
 import { useAuth, useScope } from '../context/AuthContext';
-import { getById } from '../db/store';
 import JobForm from '../components/jobs/JobForm';
 import Card from '../components/common/Card';
 import Loader from '../components/common/Loader';
@@ -45,8 +44,8 @@ export default function JobFormPage({ mode }) {
   if (loading) return <Loader label="Loading..." />;
 
   const preselectCompany = searchParams.get('companyId');
-  const recruiterCompanyName = !isAdmin && user?.companyId ? getById('companies', user.companyId)?.name : null;
-  const editingCompanyName = mode === 'edit' && job ? getById('companies', job.companyId)?.name : null;
+  const recruiterCompanyName = !isAdmin ? user?.companyName ?? null : null;
+  const editingCompanyName = mode === 'edit' && job ? job.companyName : null;
 
   return (
     <Card title={mode === 'edit' ? 'Edit job' : 'New job'} className="max-w-2xl">

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8090/api';
 
 const axiosClient = axios.create({
   baseURL: BASE_URL,
@@ -24,7 +24,12 @@ axiosClient.interceptors.response.use(
       localStorage.removeItem('hip_token');
       localStorage.removeItem('hip_user');
     }
-    return Promise.reject(error);
+    // Surface the backend's error message to callers that read `err.message`.
+    const serverMessage = error.response?.data?.message || error.response?.data?.error;
+    const normalised = new Error(serverMessage || error.message || 'Request failed');
+    normalised.status = error.response?.status;
+    normalised.response = error.response;
+    return Promise.reject(normalised);
   }
 );
 

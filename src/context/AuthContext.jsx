@@ -32,6 +32,7 @@ export function AuthProvider({ children }) {
         email: result.email,
         role: result.role,
         companyId: result.companyId,
+        companyName: result.companyName ?? null,
         title: result.title,
       };
       localStorage.setItem(TOKEN_KEY, result.token);

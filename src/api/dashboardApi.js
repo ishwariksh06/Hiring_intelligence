@@ -1,6 +1,6 @@
-import { mockDelay } from './mockHelpers';
-import * as q from '../db/queries';
+import axiosClient from './axiosClient';
 
-export async function getDashboardSummary(ctx = {}) {
-  return mockDelay(q.dashboardSummary(ctx));
+export async function getDashboardSummary() {
+  const { data } = await axiosClient.get('/dashboard/summary');
+  return data;
 }

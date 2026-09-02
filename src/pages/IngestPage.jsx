@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { loadSampleDataset, uploadResumes } from '../api/resumeApi';
-import { resetDb } from '../db/store';
+import { loadSampleDataset, uploadResumes, resetDatabase } from '../api/resumeApi';
 import UploadDropzone from '../components/resume/UploadDropzone';
 import UploadProgressList from '../components/resume/UploadProgressList';
 import Card from '../components/common/Card';
@@ -83,15 +82,20 @@ export default function IngestPage() {
     setBusy(false);
   }
 
-  function handleReset() {
+  async function handleReset() {
     if (!confirmReset) {
       setConfirmReset(true);
       return;
     }
-    resetDb();
-    setResults([]);
-    setFileStatuses([]);
-    setConfirmReset(false);
+    setBusy(true);
+    try {
+      await resetDatabase();
+      setResults([]);
+      setFileStatuses([]);
+    } finally {
+      setBusy(false);
+      setConfirmReset(false);
+    }
   }
 
   return (

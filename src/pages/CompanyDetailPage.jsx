@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { getCompanyById } from '../api/companiesApi';
 import { getJobs } from '../api/jobsApi';
-import { getAll } from '../db/store';
 import JobTable from '../components/jobs/JobTable';
 import Card from '../components/common/Card';
 import Button from '../components/common/Button';
@@ -16,10 +15,10 @@ export default function CompanyDetailPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([getCompanyById(id), getJobs({ role: 'RECRUITER', companyId: id })])
+    Promise.all([getCompanyById(id), getJobs()])
       .then(([c, j]) => {
         setCompany(c);
-        setJobs(j);
+        setJobs(j.filter((job) => job.companyId === id));
       })
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -28,7 +27,7 @@ export default function CompanyDetailPage() {
   if (loading) return <Loader label="Loading company..." />;
   if (!company) return null;
 
-  const recruiter = getAll('users').find((u) => u.companyId === id && u.role === 'RECRUITER');
+  const recruiterEmail = company.recruiterEmail;
 
   return (
     <div className="space-y-6">
@@ -45,7 +44,7 @@ export default function CompanyDetailPage() {
                 {company.contactEmail ? ` · ${company.contactEmail}` : ''}
               </p>
             )}
-            {recruiter && <p className="mt-1 text-xs text-slate-400">Recruiter login: {recruiter.email}</p>}
+            {recruiterEmail && <p className="mt-1 text-xs text-slate-400">Recruiter login: {recruiterEmail}</p>}
           </div>
           <Link to={`/jobs/new?companyId=${company.id}`}>
             <Button size="sm">Post a job for this client</Button>

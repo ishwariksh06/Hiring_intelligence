@@ -1,7 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { getById } from '../../db/store';
-import { AGENCY } from '../../db/seed';
+import { AGENCY } from '../../config/agency';
 
 const ADMIN_NAV = [
   { to: '/dashboard', label: 'Overview', icon: 'grid' },
@@ -41,14 +40,14 @@ export default function Sidebar() {
   const { user } = useAuth();
   const isAdmin = user?.role === 'ADMIN';
   const navItems = isAdmin ? ADMIN_NAV : RECRUITER_NAV;
-  const company = !isAdmin && user?.companyId ? getById('companies', user.companyId) : null;
+  const companyName = !isAdmin ? user?.companyName : null;
 
   return (
     <aside className="flex h-full w-56 shrink-0 flex-col border-r border-slate-200 bg-white">
       <div className="border-b border-slate-100 px-5 py-4">
         <p className="text-sm font-semibold text-slate-900">{AGENCY.name}</p>
         <p className="mt-0.5 text-[11px] uppercase tracking-wide text-slate-400">
-          {isAdmin ? 'Agency workspace' : company?.name || 'Client workspace'}
+          {isAdmin ? 'Agency workspace' : companyName || 'Client workspace'}
         </p>
       </div>
       <nav className="flex-1 space-y-0.5 px-2.5 py-3">

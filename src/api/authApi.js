@@ -1,22 +1,7 @@
-import { mockDelay, mockError } from './mockHelpers';
-import { getAll } from '../db/store';
+import axiosClient from './axiosClient';
 
-function publicUser(user) {
-  return {
-    token: `local.${user.role}.${user.id}`,
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    role: user.role,
-    companyId: user.companyId ?? null,
-    title: user.title ?? '',
-  };
-}
-
+// POST /api/auth/login -> { token, id, name, email, role, companyId, title, companyName }
 export async function login({ email, password }) {
-  const user = getAll('users').find(
-    (u) => u.email.toLowerCase() === String(email).toLowerCase() && u.password === password
-  );
-  if (!user) return mockError('Invalid email or password');
-  return mockDelay(publicUser(user));
+  const { data } = await axiosClient.post('/auth/login', { email, password });
+  return data;
 }

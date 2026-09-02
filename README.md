@@ -10,32 +10,47 @@ There is no candidate-facing side and no chatbot. Two roles: **agency admin** an
 
 ## Run it
 
+Two processes: the Java backend and the React dev server.
+
 ```bash
+# 1. backend  (Java 17 — the Maven wrapper downloads Maven on first run)
+cd backend
+./mvnw spring-boot:run        # Windows: mvnw.cmd spring-boot:run   → http://localhost:8090
+
+# 2. frontend  (in another terminal, from the repo root)
 npm install
-npm run dev        # http://localhost:5173
+cp .env.example .env.local    # points the app at http://localhost:8090/api
+npm run dev                   # http://localhost:5173
 ```
 
-Demo accounts (password `password123` for both):
+Demo accounts (password `password123`):
 
 | Role | Email |
 |------|-------|
 | Agency admin | `ishwari@hiringintelligence.io` |
 | Client recruiter (Northwind Logistics) | `rajesh.iyer@northwind.example` |
+| Client recruiter (Lumen Retail) | `sara.thomas@lumenretail.example` |
+| Client recruiter (Atlas Analytics) | `vivek.menon@atlasanalytics.example` |
 
 ## How the data works
 
-There is no server yet. A browser-local database (`src/db/`, stored in
-`localStorage`) is seeded on first load with 3 client companies, 8 jobs and 52
-synthetic candidates. As admin, use **Resume Ingestion** to drop more resumes
-(`.txt`/`.csv`/`.json` are parsed for real; `.pdf`/`.docx` are stored and
-ATS-flagged) or load the bundled sample batch. **Reset local database** on that
-screen restores the seed.
+The frontend talks to a real **Spring Boot + JPA** backend (`backend/`). It uses an
+embedded **H2 file database** by default (`backend/data/`, persists across restarts,
+no install) and can switch to PostgreSQL with the `postgres` profile.
+
+On first start the backend seeds 3 client companies, 8 jobs and 52 synthetic
+candidates, then runs the screening pipeline to build the `matches` table. As admin,
+use **Resume Ingestion** to drop more resumes (`.txt`/`.csv`/`.json` are parsed for
+real; `.pdf`/`.docx` are stored and ATS-flagged) or load the bundled sample batch.
+**Reset local database** wipes every table and re-seeds (`POST /api/admin/reset`).
 
 ## Docs
 
-- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — roles, data model, screening pipeline, frontend layout
-- [`docs/BACKEND_SPEC.md`](docs/BACKEND_SPEC.md) — Spring Boot + PostgreSQL implementation brief (schema, endpoints, auth, scoring)
+- [`backend/README.md`](backend/README.md) — how to run, configure and build the backend
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — roles, data model, screening pipeline, layout
+- [`docs/BACKEND_SPEC.md`](docs/BACKEND_SPEC.md) — the implementation brief the backend follows
 
 ## Stack
 
-React 19, Vite, Tailwind v4, React Router, Recharts. `npm run build`, `npm run lint`.
+- **Frontend:** React 19, Vite, Tailwind v4, React Router, Recharts, Axios. `npm run build`, `npm run lint`.
+- **Backend:** Java 17, Spring Boot 3.3 (Web MVC, Data JPA, Security/JWT), Hibernate, H2 / PostgreSQL.

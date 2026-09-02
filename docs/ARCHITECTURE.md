@@ -91,30 +91,36 @@ the project brief.
 
 ## 5. Persistence
 
-This machine has no Java/PostgreSQL, so the demo runs on a **browser-local
-database**: `src/db/store.js` keeps the five tables in `localStorage` (key
-`hip_db_v3`), seeded on first load from `src/db/seed.js`. The seed is a synthetic
-dataset modelled on Kaggle's "Updated Resume Dataset" — 3 client companies, 8
-jobs, 52 candidates across 10 job categories, with matches computed at seed time.
+Persistence is a **Spring Boot + Spring Data JPA** backend (`backend/`), layered
+`Controller → Service → Repository`. The screening pipeline of §4 is ported to
+`backend/.../screening/` (`SkillDictionary`, `ResumeParser`, `AtsChecker`,
+`Matcher`, `ScreeningService`); `DataSeeder` ports `seed.js`.
 
-- **Ingest screen** → drop `.txt`/`.csv`/`.json` resumes (parsed for real) or
-  `.pdf`/`.docx` (stored, ATS-flagged, since browsers can't read them here), or
-  click "Load bundled sample dataset" for 15 more.
-- **Reset local database** on the Ingest screen returns everything to the seed.
+- **Database:** embedded **H2 in file mode** by default (`backend/data/`, survives
+  restarts, no install). The `postgres` Spring profile switches to PostgreSQL 15+.
+  `ddl-auto=update` builds the schema; array-typed columns are stored as JSON text
+  via a JPA `AttributeConverter` so one mapping works on both engines.
+- **Seed:** on first run (empty tables) — 1 admin, 3 client companies + 1 recruiter
+  each, 8 jobs, 52 synthetic candidates modelled on Kaggle's "Updated Resume
+  Dataset"; then `ScreeningService.rescoreAllOpenJobs()` builds `matches`.
+- **Ingest screen** → `POST /api/resumes` (multipart files or a JSON batch). Text
+  resumes are parsed for real; binary PDFs/DOCX are stored and ATS-flagged.
+- **Reset local database** → `POST /api/admin/reset` wipes every table and re-seeds.
 
-The real backend is a drop-in replacement — same table shapes, same screening
-maths. See [BACKEND_SPEC.md](./BACKEND_SPEC.md).
+The frontend `src/api/*` modules are thin Axios wrappers over this API; the browser
+holds only the JWT and the cached user. See [BACKEND_SPEC.md](./BACKEND_SPEC.md) and
+[`../backend/README.md`](../backend/README.md).
 
 ## 6. Frontend structure
 
-React 19 + Vite + Tailwind v4, React Router. No backend calls — the `src/api/*`
-modules now delegate to `src/db/queries.js` instead of Axios, keeping page
-components unchanged in shape.
+React 19 + Vite + Tailwind v4, React Router. The `src/api/*` modules are thin Axios
+wrappers that call the backend at `VITE_API_BASE_URL` (default
+`http://localhost:8080/api`); `axiosClient.js` attaches the bearer token.
 
 ```
 src/
-  db/            store, seed, skills, screening, queries  ← the "backend"
-  api/           thin async wrappers page components call
+  api/           Axios wrappers page components call (+ axiosClient, sampleBatch)
+  config/        agency branding constant
   context/       AuthContext (+ useScope helper)
   components/    common/, layout/, jobs/, candidates/, analytics/, resume/
   pages/         one file per screen
@@ -122,7 +128,7 @@ src/
 
 Removed from the original v1: the AI chat assistant, the candidate portal
 (upload + application status), and self-serve registration. The Reports screen is
-left as a non-functional stub.
+backed by a minimal `reports` table (`GET /api/reports`, `POST /api/reports/generate`).
 
 ## 7. Visual language
 

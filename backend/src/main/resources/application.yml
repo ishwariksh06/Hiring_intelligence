@@ -1,0 +1,44 @@
+server:
+  # 8080 is often taken (Oracle XDB / Tomcat / other apps); the app uses 8090.
+  port: ${SERVER_PORT:8090}
+
+spring:
+  application:
+    name: hiring-intelligence-backend
+  datasource:
+    # Embedded H2 in FILE mode — a real database that persists to backend/data/
+    # between restarts. No install required. Switch to PostgreSQL with the
+    # "postgres" profile (see application-postgres.yml).
+    url: jdbc:h2:file:./data/hiring-intelligence;DB_CLOSE_DELAY=-1;AUTO_SERVER=TRUE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate.jdbc.time_zone: UTC
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 40MB
+
+app:
+  jwt:
+    # Override in real deployments: export APP_JWT_SECRET=...
+    secret: ${APP_JWT_SECRET:dev-secret-please-change-0123456789abcdef0123456789abcdef}
+    expiration: PT12H
+  cors:
+    allowed-origins: ${APP_CORS_ORIGINS:http://localhost:5173,http://localhost:4173}
+  seed:
+    # Seeds companies/users/jobs/candidates on first run (only when tables are empty).
+    enabled: true
+
+logging:
+  level:
+    org.hibernate.SQL: warn

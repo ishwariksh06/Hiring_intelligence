@@ -1,17 +1,16 @@
-import { mockDelay, mockError } from './mockHelpers';
-import * as q from '../db/queries';
+import axiosClient from './axiosClient';
 
-export async function getCandidates(ctx = {}) {
-  return mockDelay(q.listCandidates(ctx));
+export async function getCandidates() {
+  const { data } = await axiosClient.get('/candidates');
+  return data;
 }
 
-export async function getCandidateById(id, ctx = {}) {
-  const candidate = q.getCandidate(id, ctx);
-  if (!candidate) return mockError('Candidate not found');
-  return mockDelay(candidate);
+export async function getCandidateById(id) {
+  const { data } = await axiosClient.get(`/candidates/${id}`);
+  return data;
 }
 
-export async function getInterviewQuestions(id, ctx = {}) {
-  const candidate = q.getCandidate(id, ctx);
-  return mockDelay(candidate?.interviewQuestions || []);
+export async function getInterviewQuestions(id) {
+  const { data } = await axiosClient.get(`/candidates/${id}`);
+  return data?.interviewQuestions || [];
 }
