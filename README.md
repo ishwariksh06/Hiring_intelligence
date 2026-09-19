@@ -54,3 +54,17 @@ real; `.pdf`/`.docx` are stored and ATS-flagged) or load the bundled sample batc
 
 - **Frontend:** React 19, Vite, Tailwind v4, React Router, Recharts, Axios. `npm run build`, `npm run lint`.
 - **Backend:** Java 17, Spring Boot 3.3 (Web MVC, Data JPA, Security/JWT), Hibernate, H2 / PostgreSQL.
+
+## Versions and testing
+
+| Ref | What it is |
+|---|---|
+| `main` / tag `v2.0` | Final release: React + Spring Boot + Neon PostgreSQL, all test-cycle-1 defects fixed |
+| tag `v2.0-beta` | Version 2 before the fixes (state tested in cycle 1) |
+| branch `v1` / tag `v1.0` | Version 1: React prototype with mock data |
+
+Live demo: https://hiring-intelligence-eight.vercel.app (backend on Render, database on Neon).
+
+Testing: `cd backend && ./mvnw test` runs 94 tests (unit, white-box, black-box API, security, regression).
+The full test plan, results, defect log and screenshots are in
+`docs/Hiring_Intelligence_Test_Plan_and_Report.docx` and `docs/test-evidence/`.
