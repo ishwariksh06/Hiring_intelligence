@@ -5,7 +5,6 @@ services:
     rootDir: backend
     dockerfilePath: ./Dockerfile
     plan: free
-    healthCheckPath: /api/auth/login
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: postgres

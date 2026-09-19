@@ -27,3 +27,6 @@ backend/.mvn/wrapper/maven-wrapper.jar
 *.njsproj
 *.sln
 *.sw?
+.neon
+
+.vercel
