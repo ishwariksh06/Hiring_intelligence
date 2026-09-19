@@ -1,6 +1,7 @@
 server:
   # 8080 is often taken (Oracle XDB / Tomcat / other apps); the app uses 8090.
   port: ${SERVER_PORT:8090}
+  forward-headers-strategy: framework
 
 spring:
   application:

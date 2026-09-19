@@ -1,5 +1,6 @@
 package com.hiringintelligence.web;
 
+import com.hiringintelligence.service.ReadCache;
 import com.hiringintelligence.security.AppPrincipal;
 import com.hiringintelligence.service.AnalyticsService;
 import com.hiringintelligence.web.dto.AnalyticsDtos.DashboardSummary;
@@ -13,13 +14,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class DashboardController {
 
     private final AnalyticsService analyticsService;
+    private final ReadCache cache;
 
-    public DashboardController(AnalyticsService analyticsService) {
+    public DashboardController(AnalyticsService analyticsService, ReadCache cache) {
         this.analyticsService = analyticsService;
+        this.cache = cache;
     }
 
     @GetMapping("/summary")
     public DashboardSummary summary(@AuthenticationPrincipal AppPrincipal principal) {
-        return analyticsService.dashboardSummary(principal);
+        return cache.get(ReadCache.key("dashboard", principal), () -> analyticsService.dashboardSummary(principal));
     }
 }

@@ -49,9 +49,20 @@ public class JobService {
         List<Job> found = principal.isAdmin()
                 ? jobs.findAll()
                 : jobs.findByCompanyId(principal.companyId());
+        // Load companies and matches once for the whole list instead of once per job.
+        Map<UUID, String> companyNames = new HashMap<>();
+        companies.findAll().forEach(c -> companyNames.put(c.getId(), c.getName()));
+        List<UUID> ids = found.stream().map(Job::getId).toList();
+        Map<UUID, List<Match>> matchesByJob = new HashMap<>();
+        if (!ids.isEmpty()) {
+            for (Match m : matches.findByJobIdIn(ids)) {
+                matchesByJob.computeIfAbsent(m.getJobId(), k -> new ArrayList<>()).add(m);
+            }
+        }
         return found.stream()
                 .sorted(Comparator.comparing(Job::getCreatedAt).reversed())
-                .map(this::decorate)
+                .map(j -> toResponse(j, companyNames.getOrDefault(j.getCompanyId(), "Unknown company"),
+                        matchesByJob.getOrDefault(j.getId(), List.of())))
                 .toList();
     }
 
@@ -96,13 +107,14 @@ public class JobService {
     public List<JobCandidateResponse> ranking(UUID jobId, AppPrincipal principal) {
         loadScoped(jobId, principal);
 
+        List<Match> jobMatches = matches.findByJobId(jobId);
         Map<UUID, Candidate> byId = new HashMap<>();
-        for (Candidate c : candidates.findAll()) {
+        for (Candidate c : candidates.findAllById(jobMatches.stream().map(Match::getCandidateId).toList())) {
             byId.put(c.getId(), c);
         }
 
         List<JobCandidateResponse> rows = new ArrayList<>();
-        for (Match m : matches.findByJobId(jobId)) {
+        for (Match m : jobMatches) {
             Candidate c = byId.get(m.getCandidateId());
             rows.add(new JobCandidateResponse(
                     m.getId(),
@@ -158,8 +170,15 @@ public class JobService {
         job.setTitle(req.title().trim());
         job.setDescription(req.description().trim());
         job.setRequiredSkills(req.requiredSkills() == null ? new ArrayList<>() : new ArrayList<>(req.requiredSkills()));
-        job.setMinExperience(req.minExperience() == null ? 0 : req.minExperience());
-        job.setMaxExperience(req.maxExperience() == null ? 0 : req.maxExperience());
+        int min = req.minExperience() == null ? 0 : req.minExperience();
+        int max = req.maxExperience() == null ? 0 : req.maxExperience();
+        // A maximum of 0 means "no ceiling"; otherwise the range must not be inverted.
+        if (max != 0 && min > max) {
+            throw new ApiExceptions.BadRequestException(
+                    "minExperience (" + min + ") cannot be greater than maxExperience (" + max + ")");
+        }
+        job.setMinExperience(min);
+        job.setMaxExperience(max);
         if (req.status() != null && !req.status().isBlank()) {
             job.setStatus(JobStatus.valueOf(req.status().trim().toUpperCase()));
         }
@@ -168,7 +187,10 @@ public class JobService {
     private JobResponse decorate(Job job) {
         String companyName = companies.findById(job.getCompanyId())
                 .map(Company::getName).orElse("Unknown company");
-        List<Match> jobMatches = matches.findByJobId(job.getId());
+        return toResponse(job, companyName, matches.findByJobId(job.getId()));
+    }
+
+    private JobResponse toResponse(Job job, String companyName, List<Match> jobMatches) {
         long shortlisted = jobMatches.stream().filter(m -> m.getStatus() == MatchStatus.SHORTLISTED).count();
 
         return new JobResponse(

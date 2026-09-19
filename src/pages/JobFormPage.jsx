@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { createJob, getJobById, updateJob } from '../api/jobsApi';
 import { getCompanies } from '../api/companiesApi';
-import { useAuth, useScope } from '../context/AuthContext';
+import { useAuth, useScope } from '../context/useAuth';
 import JobForm from '../components/jobs/JobForm';
 import Card from '../components/common/Card';
 import Loader from '../components/common/Loader';

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getJobs } from '../api/jobsApi';
-import { useAuth, useScope } from '../context/AuthContext';
+import { useAuth, useScope } from '../context/useAuth';
 import JobTable from '../components/jobs/JobTable';
 import Card from '../components/common/Card';
 import Button from '../components/common/Button';

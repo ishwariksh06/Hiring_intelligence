@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { getJobById, getJobCandidates, setCandidateStatus } from '../api/jobsApi';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 import JobCard from '../components/jobs/JobCard';
 import CandidateTable from '../components/candidates/CandidateTable';
 import Card from '../components/common/Card';

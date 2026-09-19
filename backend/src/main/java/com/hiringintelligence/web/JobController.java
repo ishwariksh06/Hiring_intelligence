@@ -1,5 +1,6 @@
 package com.hiringintelligence.web;
 
+import com.hiringintelligence.service.ReadCache;
 import com.hiringintelligence.security.AppPrincipal;
 import com.hiringintelligence.service.JobService;
 import com.hiringintelligence.web.dto.JobDtos.JobCandidateResponse;
@@ -27,14 +28,16 @@ import java.util.UUID;
 public class JobController {
 
     private final JobService jobService;
+    private final ReadCache cache;
 
-    public JobController(JobService jobService) {
+    public JobController(JobService jobService, ReadCache cache) {
         this.jobService = jobService;
+        this.cache = cache;
     }
 
     @GetMapping
     public List<JobResponse> list(@AuthenticationPrincipal AppPrincipal principal) {
-        return jobService.list(principal);
+        return cache.get(ReadCache.key("jobs", principal), () -> jobService.list(principal));
     }
 
     @GetMapping("/{id}")
@@ -45,13 +48,17 @@ public class JobController {
     @PostMapping
     public JobResponse create(@Valid @RequestBody JobRequest request,
                               @AuthenticationPrincipal AppPrincipal principal) {
-        return jobService.create(request, principal);
+        JobResponse created = jobService.create(request, principal);
+        cache.clear();
+        return created;
     }
 
     @PutMapping("/{id}")
     public JobResponse update(@PathVariable UUID id, @Valid @RequestBody JobRequest request,
                               @AuthenticationPrincipal AppPrincipal principal) {
-        return jobService.update(id, request, principal);
+        JobResponse updated = jobService.update(id, request, principal);
+        cache.clear();
+        return updated;
     }
 
     @GetMapping("/{id}/candidates")
@@ -66,5 +73,6 @@ public class JobController {
                           @Valid @RequestBody SetStatusRequest request,
                           @AuthenticationPrincipal AppPrincipal principal) {
         jobService.setCandidateStatus(id, candidateId, request.status(), principal);
+        cache.clear();
     }
 }

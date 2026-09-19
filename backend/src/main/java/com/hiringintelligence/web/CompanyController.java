@@ -1,5 +1,6 @@
 package com.hiringintelligence.web;
 
+import com.hiringintelligence.service.ReadCache;
 import com.hiringintelligence.service.CompanyService;
 import com.hiringintelligence.web.dto.CompanyDtos.CompanyResponse;
 import com.hiringintelligence.web.dto.CompanyDtos.CreateCompanyRequest;
@@ -21,14 +22,16 @@ import java.util.UUID;
 public class CompanyController {
 
     private final CompanyService companyService;
+    private final ReadCache cache;
 
-    public CompanyController(CompanyService companyService) {
+    public CompanyController(CompanyService companyService, ReadCache cache) {
         this.companyService = companyService;
+        this.cache = cache;
     }
 
     @GetMapping
     public List<CompanyResponse> list() {
-        return companyService.list();
+        return cache.get("companies", companyService::list);
     }
 
     @GetMapping("/{id}")
@@ -38,6 +41,8 @@ public class CompanyController {
 
     @PostMapping
     public CompanyResponse create(@Valid @RequestBody CreateCompanyRequest request) {
-        return companyService.create(request);
+        CompanyResponse created = companyService.create(request);
+        cache.clear();
+        return created;
     }
 }
