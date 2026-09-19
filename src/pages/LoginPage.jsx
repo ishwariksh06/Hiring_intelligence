@@ -1,9 +1,12 @@
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 import Button from '../components/common/Button';
 import { redirectByRole } from '../utils/redirectByRole';
 import { AGENCY } from '../config/agency';
+
+// Demo accounts are shown only when VITE_SHOW_DEMO_ACCOUNTS=true (set on the demo deployment).
+const SHOW_DEMO = import.meta.env.VITE_SHOW_DEMO_ACCOUNTS === 'true';
 
 const DEMO_ACCOUNTS = [
   { label: 'Administrator (agency)', email: 'ishwari@hiringintelligence.io' },
@@ -19,7 +22,9 @@ export default function LoginPage() {
     setValue,
     setError,
     formState: { errors, isSubmitting },
-  } = useForm({ defaultValues: { email: 'ishwari@hiringintelligence.io', password: 'password123' } });
+  } = useForm({
+    defaultValues: SHOW_DEMO ? { email: 'ishwari@hiringintelligence.io', password: 'password123' } : { email: '', password: '' },
+  });
 
   async function onSubmit(values) {
     try {
@@ -70,6 +75,7 @@ export default function LoginPage() {
           </Button>
         </form>
 
+        {SHOW_DEMO && (
         <div className="mt-6 border-t border-slate-100 pt-4">
           <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">Demo accounts</p>
           <ul className="mt-2 space-y-1.5">
@@ -90,6 +96,7 @@ export default function LoginPage() {
             ))}
           </ul>
         </div>
+        )}
       </div>
     </div>
   );

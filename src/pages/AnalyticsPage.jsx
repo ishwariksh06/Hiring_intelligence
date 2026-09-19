@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { getIngestTrend, getScreeningFunnel, getSkillAnalytics, getSkillGap } from '../api/analyticsApi';
-import { useAuth, useScope } from '../context/AuthContext';
+import { useAuth, useScope } from '../context/useAuth';
 import Card from '../components/common/Card';
 import Loader from '../components/common/Loader';
 import SkillAnalyticsChart from '../components/analytics/SkillAnalyticsChart';

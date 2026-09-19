@@ -21,6 +21,9 @@ import java.util.List;
 @Service
 public class IngestionService {
 
+    private static final java.util.regex.Pattern ALLOWED_FILE_TYPE =
+            java.util.regex.Pattern.compile(".*\\.(pdf|docx|txt|md|csv|json)$", java.util.regex.Pattern.CASE_INSENSITIVE);
+
     private final CandidateRepository candidates;
     private final ResumeParser parser;
     private final AtsChecker ats;
@@ -53,6 +56,13 @@ public class IngestionService {
         int index = 0;
         for (MultipartFile file : files) {
             String name = file.getOriginalFilename() == null ? "upload_" + index + ".txt" : file.getOriginalFilename();
+            if (!ALLOWED_FILE_TYPE.matcher(name).matches()) {
+                throw new ApiExceptions.BadRequestException(
+                        "Unsupported file type: " + name + ". Allowed: PDF, DOCX, TXT, MD, CSV, JSON.");
+            }
+            if (file.isEmpty()) {
+                throw new ApiExceptions.BadRequestException("File is empty: " + name);
+            }
             boolean textLike = name.toLowerCase().matches(".*\\.(txt|csv|json|md)$")
                     || (file.getContentType() != null && file.getContentType().startsWith("text/"));
             String raw = "";

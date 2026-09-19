@@ -1,5 +1,6 @@
 package com.hiringintelligence.web;
 
+import com.hiringintelligence.service.ReadCache;
 import com.hiringintelligence.service.IngestionService;
 import com.hiringintelligence.web.dto.CandidateDtos.IngestJsonEntry;
 import com.hiringintelligence.web.dto.CandidateDtos.IngestedCandidateResponse;
@@ -20,18 +21,24 @@ import java.util.List;
 public class IngestionController {
 
     private final IngestionService ingestionService;
+    private final ReadCache cache;
 
-    public IngestionController(IngestionService ingestionService) {
+    public IngestionController(IngestionService ingestionService, ReadCache cache) {
         this.ingestionService = ingestionService;
+        this.cache = cache;
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public List<IngestedCandidateResponse> ingestJson(@RequestBody List<IngestJsonEntry> entries) {
-        return ingestionService.ingestJson(entries);
+        List<IngestedCandidateResponse> result = ingestionService.ingestJson(entries);
+        cache.clear();
+        return result;
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public List<IngestedCandidateResponse> ingestFiles(@RequestParam("files") MultipartFile[] files) {
-        return ingestionService.ingestFiles(files);
+        List<IngestedCandidateResponse> result = ingestionService.ingestFiles(files);
+        cache.clear();
+        return result;
     }
 }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getDashboardSummary } from '../api/dashboardApi';
-import { useAuth, useScope } from '../context/AuthContext';
+import { useAuth, useScope } from '../context/useAuth';
 import Card from '../components/common/Card';
 import Loader from '../components/common/Loader';
 

@@ -22,6 +22,19 @@ public final class ApiExceptions {
         }
     }
 
+    public static class TooManyRequestsException extends RuntimeException {
+        private final long retryAfterSeconds;
+
+        public TooManyRequestsException(String message, long retryAfterSeconds) {
+            super(message);
+            this.retryAfterSeconds = retryAfterSeconds;
+        }
+
+        public long getRetryAfterSeconds() {
+            return retryAfterSeconds;
+        }
+    }
+
     public static class UnauthorizedException extends RuntimeException {
         public UnauthorizedException(String message) {
             super(message);

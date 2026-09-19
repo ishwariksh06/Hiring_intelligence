@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { getCandidateById } from '../api/candidatesApi';
-import { useScope } from '../context/AuthContext';
+import { useScope } from '../context/useAuth';
 import { CATEGORICAL, CHART_CHROME, TOOLTIP_STYLE } from '../components/analytics/chartTheme';
 import Card from '../components/common/Card';
 import Loader from '../components/common/Loader';

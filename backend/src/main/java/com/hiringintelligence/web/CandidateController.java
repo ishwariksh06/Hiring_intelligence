@@ -1,5 +1,6 @@
 package com.hiringintelligence.web;
 
+import com.hiringintelligence.service.ReadCache;
 import com.hiringintelligence.security.AppPrincipal;
 import com.hiringintelligence.service.CandidateService;
 import com.hiringintelligence.web.dto.CandidateDtos.CandidateDetailResponse;
@@ -19,15 +20,17 @@ import java.util.UUID;
 public class CandidateController {
 
     private final CandidateService candidateService;
+    private final ReadCache cache;
 
-    public CandidateController(CandidateService candidateService) {
+    public CandidateController(CandidateService candidateService, ReadCache cache) {
         this.candidateService = candidateService;
+        this.cache = cache;
     }
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public List<CandidatePoolResponse> list(@AuthenticationPrincipal AppPrincipal principal) {
-        return candidateService.list(principal);
+        return cache.get(ReadCache.key("candidates", principal), () -> candidateService.list(principal));
     }
 
     @GetMapping("/{id}")
