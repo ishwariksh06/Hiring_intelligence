@@ -22,13 +22,9 @@ public class JwtService {
     public JwtService(AppProperties props) {
         byte[] secret = props.getJwt().getSecret().getBytes(StandardCharsets.UTF_8);
         if (secret.length < 32) {
-            // HS256 needs >= 256 bits; pad deterministically so dev config still boots.
-            byte[] padded = new byte[32];
-            System.arraycopy(secret, 0, padded, 0, secret.length);
-            for (int i = secret.length; i < 32; i++) {
-                padded[i] = (byte) ('x' + i);
-            }
-            secret = padded;
+            // HS256 needs >= 256 bits. Refuse to start rather than quietly weaken the key.
+            throw new IllegalArgumentException(
+                    "app.jwt.secret must be at least 32 bytes long (set APP_JWT_SECRET to a long random value)");
         }
         this.key = Keys.hmacShaKeyFor(secret);
         this.expirationMillis = props.getJwt().getExpiration().toMillis();

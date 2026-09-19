@@ -32,6 +32,14 @@ public class GlobalExceptionHandler {
         return body(HttpStatus.FORBIDDEN, ex.getMessage());
     }
 
+    @ExceptionHandler(ApiExceptions.TooManyRequestsException.class)
+    public ResponseEntity<Object> tooManyRequests(ApiExceptions.TooManyRequestsException ex) {
+        ResponseEntity<Object> base = body(HttpStatus.TOO_MANY_REQUESTS, ex.getMessage());
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                .header("Retry-After", String.valueOf(ex.getRetryAfterSeconds()))
+                .body(base.getBody());
+    }
+
     @ExceptionHandler(ApiExceptions.UnauthorizedException.class)
     public ResponseEntity<Object> unauthorized(ApiExceptions.UnauthorizedException ex) {
         return body(HttpStatus.UNAUTHORIZED, ex.getMessage());

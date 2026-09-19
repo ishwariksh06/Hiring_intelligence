@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../context/useAuth';
 import { AGENCY } from '../../config/agency';
 
 const ADMIN_NAV = [
@@ -36,14 +36,27 @@ function NavIcon({ name }) {
   );
 }
 
-export default function Sidebar() {
+export default function Sidebar({ open = false, onClose = () => {} }) {
   const { user } = useAuth();
   const isAdmin = user?.role === 'ADMIN';
   const navItems = isAdmin ? ADMIN_NAV : RECRUITER_NAV;
   const companyName = !isAdmin ? user?.companyName : null;
 
   return (
-    <aside className="flex h-full w-56 shrink-0 flex-col border-r border-slate-200 bg-white">
+    <>
+      {open && (
+        <button
+          type="button"
+          aria-label="Close menu"
+          onClick={onClose}
+          className="fixed inset-0 z-30 bg-slate-900/40 md:hidden"
+        />
+      )}
+    <aside
+      className={`fixed inset-y-0 left-0 z-40 flex w-56 shrink-0 flex-col border-r border-slate-200 bg-white transition-transform md:static md:z-auto md:translate-x-0 ${
+        open ? 'translate-x-0' : '-translate-x-full'
+      }`}
+    >
       <div className="border-b border-slate-100 px-5 py-4">
         <p className="text-sm font-semibold text-slate-900">{AGENCY.name}</p>
         <p className="mt-0.5 text-[11px] uppercase tracking-wide text-slate-400">
@@ -56,6 +69,7 @@ export default function Sidebar() {
             key={item.to}
             to={item.to}
             end={item.to === '/dashboard'}
+            onClick={onClose}
             className={({ isActive }) =>
               `flex items-center gap-2.5 rounded-md px-3 py-2 text-[13px] font-medium transition-colors ${
                 isActive ? 'bg-slate-100 text-slate-900' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'
@@ -71,5 +85,6 @@ export default function Sidebar() {
         {isAdmin ? 'Administrator access' : 'Client recruiter access'}
       </div>
     </aside>
+    </>
   );
 }

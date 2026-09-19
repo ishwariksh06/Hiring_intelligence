@@ -1,7 +1,6 @@
-import { createContext, useContext, useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
+import { AuthContext } from './authState';
 import * as authApi from '../api/authApi';
-
-const AuthContext = createContext(null);
 
 const TOKEN_KEY = 'hip_token';
 const USER_KEY = 'hip_user';
@@ -59,16 +58,4 @@ export function AuthProvider({ children }) {
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-}
-
-export function useAuth() {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be used within an AuthProvider');
-  return ctx;
-}
-
-// Convenience: the scope object every data query expects.
-export function useScope() {
-  const { user } = useAuth();
-  return { role: user?.role, companyId: user?.companyId ?? null };
 }

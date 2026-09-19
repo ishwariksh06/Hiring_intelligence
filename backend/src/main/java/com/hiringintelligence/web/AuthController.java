@@ -3,6 +3,7 @@ package com.hiringintelligence.web;
 import com.hiringintelligence.service.AuthService;
 import com.hiringintelligence.web.dto.AuthDtos.LoginRequest;
 import com.hiringintelligence.web.dto.AuthDtos.LoginResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,7 +21,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public LoginResponse login(@Valid @RequestBody LoginRequest request) {
-        return authService.login(request);
+    public LoginResponse login(@Valid @RequestBody LoginRequest request, HttpServletRequest http) {
+        return authService.login(request, http.getRemoteAddr());
     }
 }

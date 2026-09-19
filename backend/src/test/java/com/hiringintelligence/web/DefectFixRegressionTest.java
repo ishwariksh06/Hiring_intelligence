@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hiringintelligence.config.AppProperties;
 import com.hiringintelligence.security.JwtService;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -20,14 +19,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 /**
- * Probe tests that assert the DESIRED behaviour for suspected weaknesses. They failed when first run
- * (see the test report, section 10), so they are @Disabled to keep the regression suite green.
- * Remove @Disabled from a test after fixing the matching defect to turn it into a regression test.
+ * Regression tests for the defects found in the first test cycle (report section 10).
+ * PR_01..PR_06 were written as failing probes before the fixes; they now pass.
  */
-@Disabled("Known-defect probes: assert desired behaviour that is not implemented yet")
-@SpringBootTest(properties = {"spring.datasource.url=jdbc:h2:mem:probe;DB_CLOSE_DELAY=-1", "app.seed.enabled=true"})
+@SpringBootTest(properties = {"spring.datasource.url=jdbc:h2:mem:defectfix;DB_CLOSE_DELAY=-1", "app.seed.enabled=true"})
 @AutoConfigureMockMvc
-class KnownDefectProbeTest {
+class DefectFixRegressionTest {
 
     @Autowired MockMvc mvc;
     @Autowired ObjectMapper json;
@@ -53,7 +50,7 @@ class KnownDefectProbeTest {
         int last = 0;
         for (int i = 0; i < 15; i++) {
             last = mvc.perform(post("/api/auth/login").contentType(MediaType.APPLICATION_JSON)
-                    .content("{\"email\":\"ishwari@hiringintelligence.io\",\"password\":\"bad" + i + "\"}"))
+                    .content("{\"email\":\"victim-a@example.com\",\"password\":\"bad" + i + "\"}"))
                     .andReturn().getResponse().getStatus();
         }
         assertThat(last).isEqualTo(429);
@@ -109,7 +106,56 @@ class KnownDefectProbeTest {
         JsonNode first = pool.isArray() ? pool.get(0) : pool.get("content").get(0);
         int status = mvc.perform(get("/api/candidates/" + first.get("id").asText())
                 .header("Authorization", "Bearer " + recruiter)).andReturn().getResponse().getStatus();
-        System.out.println("PR_06 status=" + status);
         assertThat(status).isIn(403, 404);
+    }
+    @Test
+    void PR_07_pdfUploadIsStillAccepted() throws Exception {
+        String admin = login("ishwari@hiringintelligence.io");
+        MockMultipartFile pdf = new MockMultipartFile("files", "cv.pdf", "application/pdf", "%PDF-1.4 fake".getBytes());
+        int status = mvc.perform(multipart("/api/resumes").file(pdf).header("Authorization", "Bearer " + admin))
+                .andReturn().getResponse().getStatus();
+        assertThat(status).isEqualTo(200);
+    }
+
+    @Test
+    void PR_08_emptyFileIsRejected() throws Exception {
+        String admin = login("ishwari@hiringintelligence.io");
+        MockMultipartFile empty = new MockMultipartFile("files", "empty.txt", "text/plain", new byte[0]);
+        int status = mvc.perform(multipart("/api/resumes").file(empty).header("Authorization", "Bearer " + admin))
+                .andReturn().getResponse().getStatus();
+        assertThat(status).isEqualTo(400);
+    }
+
+    @Test
+    void PR_09_zeroMaxMeansNoCeilingAndIsAccepted() throws Exception {
+        String admin = login("ishwari@hiringintelligence.io");
+        String cid = json.readTree(mvc.perform(get("/api/companies").header("Authorization", "Bearer " + admin))
+                .andReturn().getResponse().getContentAsString()).get(0).get("id").asText();
+        int status = mvc.perform(post("/api/jobs").header("Authorization", "Bearer " + admin)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"companyId\":\"" + cid + "\",\"title\":\"Open ended\",\"description\":\"x\","
+                        + "\"requiredSkills\":[\"Java\"],\"minExperience\":3,\"maxExperience\":0}"))
+                .andReturn().getResponse().getStatus();
+        assertThat(status).isEqualTo(200);
+    }
+
+    @Test
+    void PR_10_throttledLoginReturnsRetryAfterHeader() throws Exception {
+        String header = null;
+        for (int i = 0; i < 7; i++) {
+            header = mvc.perform(post("/api/auth/login").contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"email\":\"victim-b@example.com\",\"password\":\"nope" + i + "\"}"))
+                    .andReturn().getResponse().getHeader("Retry-After");
+        }
+        assertThat(header).isNotNull();
+    }
+
+    @Test
+    void PR_11_correctPasswordStillWorksAfterFewFailures() throws Exception {
+        for (int i = 0; i < 3; i++) {
+            mvc.perform(post("/api/auth/login").contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"email\":\"priya@nowhere.test\",\"password\":\"x\"}"));
+        }
+        assertThat(login("ishwari@hiringintelligence.io")).isNotBlank();
     }
 }
