@@ -17,4 +17,4 @@ services:
       - key: APP_JWT_SECRET
         generateValue: true
       - key: APP_CORS_ORIGINS
-        value: https://hiring-intelligence.vercel.app
+        value: https://hiring-intelligence-eight.vercel.app,https://hiring-intelligence-ishwariksh06.vercel.app
