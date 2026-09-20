@@ -1,5 +1,6 @@
 # Hiring Intelligence
-
+Team: Ishwari Kshirsagar (53013240102), Pratiksha Kunwar (53013240104), Shreya Pillai (53013240088).
+Project documents are stored in the docs file
 A recruitment-agency screening tool. The agency ingests candidate resumes in bulk
 on behalf of client companies; the system parses each resume, runs an ATS
 completeness check, scores every candidate against every open job, and hands each
@@ -73,4 +74,4 @@ Design document and diagrams (WBS, AOA, AON, CPM, PERT, use case, class, ER): `d
 
 Complete project documentation for submission: `docs/Hiring_Intelligence_Project_Documentation.docx`.
 
-Team: Ishwari Kshirsagar (53013240102), Pratiksha Kunwar (53013240104), Shreya Pillai (53013240088).
+
