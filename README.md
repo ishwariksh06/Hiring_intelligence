@@ -68,10 +68,8 @@ Live demo: https://hiring-intelligence-eight.vercel.app (backend on Render, data
 
 Testing: `cd backend && ./mvnw test` runs 94 tests (unit, white-box, black-box API, security, regression).
 The full test plan, results, defect log and screenshots are in
-`docs/Hiring_Intelligence_Test_Plan_and_Report.docx` and `docs/test-evidence/`.
+`docs/Final_version_Test.docx` and `docs/test-evidence/`.
 
-Design document and diagrams (WBS, AOA, AON, CPM, PERT, use case, class, ER): `docs/design/`.
+Design document: `docs/Final_design.docx`. Diagram images (WBS, AOA, AON, CPM, PERT, use case, class, ER): `docs/design/diagrams/`.
 
-Complete project documentation for submission: `docs/Hiring_Intelligence_Project_Documentation.docx`.
-
-
+Complete project report for submission: `docs/Final_report.docx`.
