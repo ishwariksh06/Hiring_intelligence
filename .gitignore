@@ -30,3 +30,6 @@ backend/.mvn/wrapper/maven-wrapper.jar
 .neon
 
 .vercel
+
+# Word lock files
+~$*

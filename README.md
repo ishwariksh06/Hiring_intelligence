@@ -70,3 +70,7 @@ The full test plan, results, defect log and screenshots are in
 `docs/Hiring_Intelligence_Test_Plan_and_Report.docx` and `docs/test-evidence/`.
 
 Design document and diagrams (WBS, AOA, AON, CPM, PERT, use case, class, ER): `docs/design/`.
+
+Complete project documentation for submission: `docs/Hiring_Intelligence_Project_Documentation.docx`.
+
+Team: Ishwari Kshirsagar (53013240102), Pratiksha Kunwar (53013240104), Shreya Pillai (53013240088).
